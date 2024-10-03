@@ -6,18 +6,11 @@ import (
 
 	"github.com/hawful70/example-social/internal/db"
 	"github.com/hawful70/example-social/internal/store"
-	"github.com/joho/godotenv"
+	"github.com/hawful70/example-social/utils"
 )
 
-func Init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-}
-
 func main() {
-	Init()
+	utils.Init()
 
 	cfg := config{
 		addr: ":" + os.Getenv("ADDR"),

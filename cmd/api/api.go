@@ -7,12 +7,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/hawful70/example-social/internal/ratelimiter"
 	"github.com/hawful70/example-social/internal/store"
+	"go.uber.org/zap"
 )
 
 type application struct {
-	config config
-	store  store.Storage
+	config      config
+	store       store.Storage
+	logger      *zap.SugaredLogger
+	rateLimiter ratelimiter.Limiter
 }
 
 type config struct {
@@ -24,6 +28,7 @@ type config struct {
 	frontendURL string
 	auth        authConfig
 	redisCfg    redisConfig
+	rateLimiter ratelimiter.Config
 }
 
 type redisConfig struct {
@@ -75,6 +80,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Recoverer)
 
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(app.RateLimiterMiddleware)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))

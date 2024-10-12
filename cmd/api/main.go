@@ -9,6 +9,8 @@ import (
 	"github.com/hawful70/example-social/utils"
 )
 
+const version = "1.1.0"
+
 func main() {
 	utils.Init()
 

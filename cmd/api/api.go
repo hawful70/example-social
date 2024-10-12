@@ -7,16 +7,22 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/hawful70/example-social/internal/auth"
+	"github.com/hawful70/example-social/internal/mailer"
 	"github.com/hawful70/example-social/internal/ratelimiter"
 	"github.com/hawful70/example-social/internal/store"
+	"github.com/hawful70/example-social/internal/store/cache"
 	"go.uber.org/zap"
 )
 
 type application struct {
-	config      config
-	store       store.Storage
-	logger      *zap.SugaredLogger
-	rateLimiter ratelimiter.Limiter
+	config        config
+	store         store.Storage
+	cacheStorage  cache.Storage
+	logger        *zap.SugaredLogger
+	mailer        mailer.Client
+	authenticator auth.Authenticator
+	rateLimiter   ratelimiter.Limiter
 }
 
 type config struct {

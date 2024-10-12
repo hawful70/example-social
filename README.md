@@ -37,5 +37,5 @@ This is a social platform project built as an example application using Go, Redi
 
 4. Run the application:
    ```bash
-   go run main.go
+   go run cmd/api/main.go
    ```

@@ -34,8 +34,16 @@ This is a social platform project built as an example application using Go, Redi
    go mod tidy
    ```
 3. Set up environment variables for Redis and PostgreSQL connections.
-
-4. Run the application:
-   ```bash
-   go run cmd/api/main.go
-   ```
+4. Install Air for hot reloading:
+  ```bash
+  curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh
+  ```
+5. Run the application:
+   - Regular mode:
+     ```bash
+     go run cmd/api/main.go
+     ```
+   - With hot reload:
+     ```bash
+     air
+     ```

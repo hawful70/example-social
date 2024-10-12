@@ -12,7 +12,7 @@ import (
 const version = "1.1.0"
 
 func main() {
-	utils.Init()
+	utils.InitEnv()
 
 	cfg := config{
 		addr: ":" + os.Getenv("ADDR"),

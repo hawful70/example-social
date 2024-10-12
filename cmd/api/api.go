@@ -115,6 +115,23 @@ func (app *application) mount() http.Handler {
 			})
 		})
 
+		r.Route("/users", func(r chi.Router) {
+			r.Put("/activate/{token}", app.activateUserHandler)
+
+			r.Route("/{userID}", func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware)
+
+				r.Get("/", app.getUserHandler)
+				r.Put("/follow", app.followUserHandler)
+				r.Put("/unfollow", app.unfollowUserHandler)
+			})
+
+			r.Group(func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware)
+				r.Get("/feed", app.getUserFeedHandler)
+			})
+		})
+
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUserHandler)
 			r.Post("/token", app.createTokenHandler)

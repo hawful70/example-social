@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	utils.Init()
+	utils.InitEnv()
 	addr := os.Getenv("DB_ADDR")
 	conn, err := db.New(addr, 10, 10, "15m")
 	if err != nil {

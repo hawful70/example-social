@@ -7,6 +7,7 @@ import (
 	"github.com/hawful70/example-social/internal/db"
 	"github.com/hawful70/example-social/internal/store"
 	"github.com/hawful70/example-social/utils"
+	"go.uber.org/zap"
 )
 
 const version = "1.1.0"
@@ -24,13 +25,23 @@ func main() {
 		},
 	}
 
-	// Main database
-	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
+	// Main Database
+	db, err := db.New(
+		cfg.db.addr,
+		cfg.db.maxOpenConns,
+		cfg.db.maxIdleConns,
+		cfg.db.maxIdleTime,
+	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
+
 	defer db.Close()
-	log.Println("database connection pool established")
+	logger.Info("database connection pool established")
 
 	store := store.NewStorage(db)
 	app := &application{

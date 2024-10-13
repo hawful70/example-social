@@ -1,6 +1,12 @@
 include .env
 MIGRATIONS_PATH = ./cmd/migrate/migrations
 
+clean:
+	@echo "Cleaning..."
+	@docker compose -f .container/docker-compose.yml down --remove-orphans
+	@docker volume rm -f container_social-postgres-data
+	@docker volume rm -f container_social-redis-data
+
 migration:
 	@migrate create -seq -ext sql -dir $(MIGRATIONS_PATH) $(filter-out $@,$(MAKECMDGOALS))
 

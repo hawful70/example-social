@@ -33,9 +33,14 @@ func (s *CommentStore) GetByPostID(ctx context.Context, postID int64) ([]Comment
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			return
+		}
+	}(rows)
 
-	comments := []Comment{}
+	var comments []Comment
 	for rows.Next() {
 		var c Comment
 		c.User = User{}

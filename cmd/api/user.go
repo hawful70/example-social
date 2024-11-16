@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -35,8 +36,8 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := app.getUser(r.Context(), userID)
 	if err != nil {
-		switch err {
-		case store.ErrNotFound:
+		switch {
+		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
 			return
 		default:
@@ -75,8 +76,8 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	if err := app.store.Followers.Follow(ctx, followerUser.ID, followedID); err != nil {
-		switch err {
-		case store.ErrConflict:
+		switch {
+		case errors.Is(err, store.ErrConflict):
 			app.conflictResponse(w, r, err)
 			return
 		default:
@@ -140,8 +141,8 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 
 	err := app.store.Users.Activate(r.Context(), token)
 	if err != nil {
-		switch err {
-		case store.ErrNotFound:
+		switch {
+		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
 		default:
 			app.internalServerError(w, r, err)

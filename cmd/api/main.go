@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
@@ -40,7 +41,12 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}(db)
 	logger.Info("database connection pool established")
 
 	store := store.NewStorage(db)

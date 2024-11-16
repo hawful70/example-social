@@ -7,37 +7,55 @@ import (
 func (app *application) internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Errorw("internal error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusInternalServerError, "the server encountered a problem")
+	err = writeJSONError(w, http.StatusInternalServerError, "the server encountered a problem")
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) forbiddenResponse(w http.ResponseWriter, r *http.Request) {
 	app.logger.Warnw("forbidden", "method", r.Method, "path", r.URL.Path, "error")
 
-	writeJSONError(w, http.StatusForbidden, "forbidden")
+	err := writeJSONError(w, http.StatusForbidden, "forbidden")
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Warnf("bad request", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusBadRequest, err.Error())
+	err = writeJSONError(w, http.StatusBadRequest, err.Error())
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) conflictResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Errorf("conflict response", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusConflict, err.Error())
+	err = writeJSONError(w, http.StatusConflict, err.Error())
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) notFoundResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Warnf("not found error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusNotFound, "not found")
+	err = writeJSONError(w, http.StatusNotFound, "not found")
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) unauthorizedErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Warnf("unauthorized error", "method", r.Method, "path", r.URL.Path, "error", err.Error())
 
-	writeJSONError(w, http.StatusUnauthorized, "unauthorized")
+	err = writeJSONError(w, http.StatusUnauthorized, "unauthorized")
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) unauthorizedBasicErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
@@ -45,7 +63,10 @@ func (app *application) unauthorizedBasicErrorResponse(w http.ResponseWriter, r 
 
 	w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
 
-	writeJSONError(w, http.StatusUnauthorized, "unauthorized")
+	err = writeJSONError(w, http.StatusUnauthorized, "unauthorized")
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http.Request, retryAfter string) {
@@ -53,5 +74,8 @@ func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http
 
 	w.Header().Set("Retry-After", retryAfter)
 
-	writeJSONError(w, http.StatusTooManyRequests, "rate limit exceeded, retry after: "+retryAfter)
+	err := writeJSONError(w, http.StatusTooManyRequests, "rate limit exceeded, retry after: "+retryAfter)
+	if err != nil {
+		return
+	}
 }

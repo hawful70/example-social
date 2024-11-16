@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -69,10 +70,10 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	hashToken := hex.EncodeToString(hash[:])
 	err := app.store.Users.CreateAndInvite(ctx, user, hashToken, app.config.mail.exp)
 	if err != nil {
-		switch err {
-		case store.ErrDuplicateEmail:
+		switch {
+		case errors.Is(err, store.ErrDuplicateEmail):
 			app.badRequestResponse(w, r, err)
-		case store.ErrDuplicateUsername:
+		case errors.Is(err, store.ErrDuplicateUsername):
 			app.badRequestResponse(w, r, err)
 		default:
 			app.internalServerError(w, r, err)
@@ -148,8 +149,8 @@ func (app *application) createTokenHandler(w http.ResponseWriter, r *http.Reques
 
 	user, err := app.store.Users.GetByEmail(r.Context(), payload.Email)
 	if err != nil {
-		switch err {
-		case store.ErrNotFound:
+		switch {
+		case errors.Is(err, store.ErrNotFound):
 			app.unauthorizedErrorResponse(w, r, err)
 		default:
 			app.internalServerError(w, r, err)

@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -20,7 +21,7 @@ func (s *UserStore) Get(ctx context.Context, userID int64) (*store.User, error) 
 	cacheKey := fmt.Sprintf("user-%d", userID)
 
 	data, err := s.rdb.Get(ctx, cacheKey).Result()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -40,12 +41,12 @@ func (s *UserStore) Get(ctx context.Context, userID int64) (*store.User, error) 
 func (s *UserStore) Set(ctx context.Context, user *store.User) error {
 	cacheKey := fmt.Sprintf("user-%d", user.ID)
 
-	json, err := json.Marshal(user)
+	newJson, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 
-	return s.rdb.SetEx(ctx, cacheKey, json, UserExpTime).Err()
+	return s.rdb.SetEx(ctx, cacheKey, newJson, UserExpTime).Err()
 }
 
 func (s *UserStore) Delete(ctx context.Context, userID int64) {

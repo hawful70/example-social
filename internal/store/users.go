@@ -286,8 +286,8 @@ func (s *UserStore) GetByEmail(ctx context.Context, email string) (*User, error)
 		&user.CreatedAt,
 	)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
 			return nil, ErrNotFound
 		default:
 			return nil, err

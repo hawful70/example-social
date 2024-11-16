@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
@@ -16,8 +17,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer func(conn *sql.DB) {
+		err := conn.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(conn)
 
-	store := store.NewStorage(conn)
-	db.Seed(store, conn)
+	newStorage := store.NewStorage(conn)
+	db.Seed(newStorage, conn)
 }

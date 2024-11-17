@@ -17,18 +17,31 @@ func main() {
 	utils.InitEnv()
 
 	cfg := config{
-		addr: ":" + os.Getenv("ADDR"),
+		addr:   ":" + os.Getenv("ADDR"),
+		apiURL: os.Getenv("EXTERNAL_URL"),
 		db: dbConfig{
 			addr:         os.Getenv("DB_ADDR"),
 			maxOpenConns: 10,
 			maxIdleConns: 10,
 			maxIdleTime:  "15m",
 		},
+		redisCfg: redisConfig{
+			addr:    os.Getenv("REDIS_ADDR"),
+			pw:      os.Getenv("REDIS_PW"),
+			db:      0,
+			enabled: false,
+		},
+		env: os.Getenv("ENV"),
 	}
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
-	defer logger.Sync()
+	defer func(logger *zap.SugaredLogger) {
+		err := logger.Sync()
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}(logger)
 
 	// Main Database
 	db, err := db.New(

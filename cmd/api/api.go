@@ -2,6 +2,7 @@ package main
 
 import (
 	"expvar"
+	"github.com/hawful70/example-social/docs"
 	"log"
 	"net/http"
 	"os"
@@ -146,6 +147,10 @@ func (app *application) mount() http.Handler {
 }
 
 func (app *application) run(mux http.Handler) error {
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Host = app.config.addr
+	docs.SwaggerInfo.BasePath = "/v1"
+
 	srv := &http.Server{
 		Addr:         app.config.addr,
 		Handler:      mux,
